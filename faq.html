@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="الأسئلة الشائعة - إجابات على جميع أسئلتك حول بروتوكول تحويل حياتك">
+    <title>الأسئلة الشائعة | تحويل حياتك</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FF6B35">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/mobile-first.css">
+
+    <style>
+        body {
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .faq-header {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .faq-header h1 {
+            color: #2d3748;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .faq-header .subtitle {
+            color: #718096;
+            font-size: 1.2em;
+            line-height: 1.8;
+        }
+
+        /* Search Box */
+        .search-box {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #FF6B35;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        /* Categories */
+        .categories {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .categories-title {
+            color: #2d3748;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .category-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #4a5568;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: #FF6B35;
+            border-color: #FF6B35;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* FAQ Content */
+        .faq-content {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            margin-bottom: 30px;
+        }
+
+        .faq-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            color: #FF6B35;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Accordion Items */
+        .faq-item {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item.active {
+            border-color: #FF6B35;
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.15);
+        }
+
+        .faq-question {
+            background: #f7fafc;
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .faq-item.active .faq-question {
+            background: #fff5f0;
+        }
+
+        .faq-question:hover {
+            background: #edf2f7;
+        }
+
+        .question-text {
+            color: #2d3748;
+            font-weight: 700;
+            font-size: 1.15em;
+            flex: 1;
+        }
+
+        .question-icon {
+            color: #FF6B35;
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+            margin-left: 15px;
+        }
+
+        .faq-item.active .question-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, padding 0.5s ease;
+            background: white;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 1000px;
+            padding: 20px 25px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .answer-content {
+            color: #4a5568;
+            font-size: 1.05em;
+            line-height: 1.8;
+        }
+
+        .answer-content strong {
+            color: #2d3748;
+        }
+
+        .answer-content ul {
+            margin: 15px 0;
+            padding-right: 25px;
+        }
+
+        .answer-content li {
+            margin-bottom: 10px;
+        }
+
+        .answer-content code {
+            background: #f7fafc;
+            padding: 2px 8px;
+            border-radius: 5px;
+            color: #e53e3e;
+            font-family: 'Courier New', monospace;
+        }
+
+        .highlight-box {
+            background: #eff6ff;
+            border-right: 4px solid #3b82f6;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .highlight-box p {
+            color: #1e40af;
+            margin: 0;
+        }
+
+        /* Still Have Questions */
+        .contact-cta {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .contact-cta h3 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .contact-cta p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .contact-btn {
+            display: inline-block;
+            background: white;
+            color: #38a169;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        .footer-nav {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: #4a5568;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .footer-links a:hover {
+            background: #FF6B35;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .back-home {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B35 0%, #ff8c42 100%);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-top: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .back-home:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.3);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+            font-size: 1.2em;
+            display: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .faq-header {
+                padding: 25px 20px;
+            }
+
+            .faq-header h1 {
+                font-size: 1.8em;
+            }
+
+            .faq-content {
+                padding: 25px 20px;
+            }
+
+            .section-title {
+                font-size: 1.5em;
+            }
+
+            .question-text {
+                font-size: 1em;
+            }
+
+            .category-buttons {
+                flex-direction: column;
+            }
+
+            .category-btn {
+                width: 100%;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="faq-container">
+        <!-- Header -->
+        <div class="faq-header">
+            <h1>❓ الأسئلة الشائعة</h1>
+            <p class="subtitle">
+                الإجابات على جميع أسئلتك حول البروتوكول ونظام اللعبة
+            </p>
+        </div>
+
+        <!-- Search Box -->
+        <div class="search-box">
+            <input
+                type="text"
+                class="search-input"
+                id="searchInput"
+                placeholder="🔍 ابحث عن سؤالك هنا..."
+            >
+        </div>
+
+        <!-- Categories -->
+        <div class="categories">
+            <div class="categories-title">تصفح حسب الفئة:</div>
+            <div class="category-buttons">
+                <button class="category-btn active" data-category="all">الكل</button>
+                <button class="category-btn" data-category="protocol">البروتوكول</button>
+                <button class="category-btn" data-category="game">نظام اللعبة</button>
+                <button class="category-btn" data-category="privacy">الخصوصية</button>
+                <button class="category-btn" data-category="technical">تقني</button>
+                <button class="category-btn" data-category="general">عام</button>
+            </div>
+        </div>
+
+        <!-- FAQ Content -->
+        <div class="faq-content" id="faqContent">
+            <!-- General Questions -->
+            <div class="faq-section" data-category="general">
+                <h2 class="section-title">
+                    <span>🌟</span>
+                    أسئلة عامة
+                </h2>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">شنو هو موقع "تحويل حياتك"؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                موقع "تحويل حياتك" هو منصة تطوير ذاتي مجانية تساعدك تفهم نفسك أكتر وتحول حياتك للأحسن. الموقع بيقدم:
+                            </p>
+                            <ul>
+                                <li><strong>بروتوكول الـ 27 سؤال:</strong> أسئلة عميقة تساعدك تكتشف نفسك</li>
+                                <li><strong>نظام اللعبة:</strong> يحول حياتك للعبة فيديو بنقاط وإنجازات</li>
+                                <li><strong>المكونات الستة:</strong> خارطة طريق واضحة للتغيير</li>
+                            </ul>
+                            <p>
+                                الموقع <strong>مجاني بالكامل</strong> ومبني على أبحاث علمية من Dan Koe و Maxwell Maltz وغيرهم.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">هل الموقع مجاني فعلاً؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                <strong>نعم، مجاني 100%!</strong> كل الميزات الأساسية متاحة بدون أي رسوم:
+                            </p>
+                            <ul>
+                                <li>البروتوكول الكامل (27 سؤال)</li>
+                                <li>نظام اللعبة والإنجازات</li>
+                                <li>التخزين المحلي لبياناتك</li>
+                                <li>جميع المقالات والموارد التعليمية</li>
+                            </ul>
+                            <div class="highlight-box">
+                                <p>
+                                    <strong>💡 كيف نغطي التكاليف؟</strong> عندنا إعلانات بسيطة من Google AdSense تساعدنا نحافظ على الموقع مجاني للجميع. تقدر تستخدم مانع الإعلانات لو حابب.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">كم من الوقت يستغرق إكمال البروتوكول؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                البروتوكول مصمم ليكتمل في <strong>يوم واحد</strong>، لكن الوقت الفعلي يعتمد عليك:
+                            </p>
+                            <ul>
+                                <li><strong>سريع (2-3 ساعات):</strong> إجابات مختصرة ومباشرة</li>
+                                <li><strong>متوسط (4-6 ساعات):</strong> إجابات متأنية مع التفكير</li>
+                                <li><strong>عميق (يوم كامل):</strong> إجابات تفصيلية مع تأمل عميق</li>
+                            </ul>
+                            <div class="highlight-box">
+                                <p>
+                                    <strong>نصيحة:</strong> لا تستعجل! كل دقيقة بتقضيها في التفكير العميق هي استثمار في مستقبلك. البروتوكول بيحفظ إجاباتك تلقائياً، فتقدر تاخد راحتك.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Protocol Questions -->
+            <div class="faq-section" data-category="protocol">
+                <h2 class="section-title">
+                    <span>📝</span>
+                    أسئلة عن البروتوكول
+                </h2>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">شنو هي المكونات الستة؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                المكونات الستة هي العناصر الأساسية لتحويل حياتك:
+                            </p>
+                            <ul>
+                                <li><strong>1. Anti-Vision (الرؤية السلبية):</strong> الحياة اللي ما عايزها - الألم اللي بتهرب منه</li>
+                                <li><strong>2. Vision (الرؤية الإيجابية):</strong> الحياة اللي حابب تعيشها - هدفك النهائي</li>
+                                <li><strong>3. Year Goal (هدف السنة):</strong> الإنجاز الكبير اللي بتشتغل عليه هالسنة</li>
+                                <li><strong>4. Month Project (مشروع الشهر):</strong> المشروع المحدد اللي بيقربك من هدف السنة</li>
+                                <li><strong>5. Daily Levers (الروافع اليومية):</strong> المهام الـ 3-5 اللي بتعملها كل يوم</li>
+                                <li><strong>6. Constraints (القيود):</strong> القواعد والحدود اللي بتحطها لنفسك</li>
+                            </ul>
+                            <p>
+                                هالمكونات الستة بيشتغلوا مع بعض زي نظام متكامل يحول حياتك من الفوضى للوضوح.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">لازم أجاوب على كل الأسئلة دفعة واحدة؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                <strong>لا، مش لازم!</strong> الموقع بيحفظ إجاباتك تلقائياً بعد كل سؤال. تقدر:
+                            </p>
+                            <ul>
+                                <li>توقف في أي وقت وترجع تكمل لاحقاً</li>
+                                <li>تعدل إجاباتك في أي وقت</li>
+                                <li>تاخد استراحة بين الأسئلة</li>
+                                <li>تجاوب على جزء الصبح والباقي المساء</li>
+                            </ul>
+                            <div class="highlight-box">
+                                <p>
+                                    <strong>💾 الحفظ التلقائي:</strong> كل ما تكتب حرف، الموقع بيحفظه في جهازك. ما تخاف من فقدان أي بيانات!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">ماذا لو لم أعرف كيف أجيب على سؤال معين؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                دا شيء طبيعي! كل سؤال في البروتوكول عميق ويحتاج تفكير. إليك بعض النصائح:
+                            </p>
+                            <ul>
+                                <li><strong>اقرأ التلميحة:</strong> كل سؤال عنده hint يوضح المقصود</li>
+                                <li><strong>اكتب أي حاجة:</strong> حتى لو مش متأكد - الكتابة بتساعد في التفكير</li>
+                                <li><strong>تخطى مؤقتاً:</strong> ارجع للسؤال لاحقاً بعد ما تفكر فيه</li>
+                                <li><strong>كن صادقاً:</strong> مافي إجابة "صح" أو "غلط" - المهم الصدق مع نفسك</li>
+                            </ul>
+                            <p>
+                                <strong>تذكّر:</strong> الأسئلة الصعبة هي الأكثر أهمية - تحديداً لأنها بتكشف حاجات مهمة عن نفسك.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game System Questions -->
+            <div class="faq-section" data-category="game">
+                <h2 class="section-title">
+                    <span>🎮</span>
+                    أسئلة عن نظام اللعبة
+                </h2>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">كيف يعمل نظام اللعبة؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                نظام اللعبة بيحول حياتك للعبة فيديو عشان يخلي التغيير ممتع ومستمر:
+                            </p>
+                            <ul>
+                                <li><strong>XP (نقاط الخبرة):</strong> تكسب نقاط مع كل مهمة تنجزها</li>
+                                <li><strong>Levels (المستويات):</strong> ترقى لمستوى أعلى كل ما تجمع XP كافي</li>
+                                <li><strong>Achievements (الإنجازات):</strong> تفتح أوسمة خاصة عند تحقيق معالم معينة</li>
+                                <li><strong>Streaks (السلاسل):</strong> تتبع الأيام المتتالية من الإنجاز</li>
+                                <li><strong>Daily Progress:</strong> شوف تقدمك اليومي بصرياً</li>
+                            </ul>
+                            <p>
+                                النظام دا مبني على علم نفس الألعاب وحالة التدفق (Flow State) عشان يحفزك تستمر.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">كيف أكسب نقاط (XP)؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                تكسب نقاط XP من خلال:
+                            </p>
+                            <ul>
+                                <li><strong>إتمام مهمة يومية:</strong> 10 XP لكل مهمة من Daily Levers</li>
+                                <li><strong>إكمال البروتوكول:</strong> مكافآت كبيرة عند إتمام الأجزاء</li>
+                                <li><strong>السلاسل المتتالية:</strong> بونص إضافي كل ما تحافظ على streak</li>
+                            </ul>
+                            <div class="highlight-box">
+                                <p>
+                                    <strong>💡 نصيحة:</strong> ركز على الاستمرارية مش الكمال. مهمة واحدة كل يوم أفضل من 10 مهام مرة وحدة!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">شنو فائدة المستويات والإنجازات؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                المستويات والإنجازات مش بس "للعب" - عندها فوائد نفسية حقيقية:
+                            </p>
+                            <ul>
+                                <li><strong>التحفيز البصري:</strong> تشوف تقدمك بوضوح</li>
+                                <li><strong>الشعور بالإنجاز:</strong> دوبامين طبيعي مع كل إنجاز</li>
+                                <li><strong>المحاسبة الذاتية:</strong> تتبع أدائك على المدى الطويل</li>
+                                <li><strong>بناء الزخم:</strong> كل إنجاز يدفعك للتالي</li>
+                            </ul>
+                            <p>
+                                المستويات العالية تثبت لنفسك إنك قادر على الالتزام والتغيير - وهذا أهم من أي مكافأة خارجية.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy Questions -->
+            <div class="faq-section" data-category="privacy">
+                <h2 class="section-title">
+                    <span>🔒</span>
+                    أسئلة عن الخصوصية
+                </h2>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">هل إجاباتي خاصة فعلاً؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                <strong>نعم، خاصة 100%!</strong> إليك الضمانات:
+                            </p>
+                            <ul>
+                                <li><strong>تخزين محلي فقط:</strong> إجاباتك محفوظة في <code>localStorage</code> بجهازك</li>
+                                <li><strong>لا نصل لبياناتك:</strong> نحن <strong>لا نستطيع</strong> رؤية إجاباتك</li>
+                                <li><strong>لا نرسل بيانات:</strong> ما فيه أي إرسال لخوادمنا</li>
+                                <li><strong>لا نبيع بيانات:</strong> ما عندنا بياناتك أصلاً عشان نبيعها!</li>
+                            </ul>
+                            <div class="highlight-box">
+                                <p>
+                                    <strong>كيف تتأكد بنفسك؟</strong> افتح DevTools في المتصفح → Application → Local Storage → شوف بياناتك المحفوظة محلياً فقط.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">ماذا يحدث لو مسحت المتصفح أو الـ cookies؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                <strong>تحذير:</strong> لو مسحت بيانات المتصفح، هتفقد إجاباتك!
+                            </p>
+                            <p>
+                                <strong>الحلول:</strong>
+                            </p>
+                            <ul>
+                                <li><strong>انسخ إجاباتك:</strong> دورياً انسخ إجاباتك لملف Word أو Notes</li>
+                                <li><strong>خد screenshot:</strong> صور شاشة لإجاباتك المهمة</li>
+                                <li><strong>اطبع:</strong> اطبع البروتوكول المكتمل</li>
+                                <li><strong>استخدم متصفح واحد:</strong> التزم بمتصفح معين للموقع دا</li>
+                            </ul>
+                            <div class="highlight-box">
+                                <p>
+                                    <strong>ليه ما نحفظ في خادم؟</strong> عشان نحمي خصوصيتك 100%. البيانات في جهازك فقط = أمان كامل.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">هل يمكنني استخدام الموقع بدون حساب؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                <strong>نعم!</strong> الموقع ما يحتاج حساب نهائياً:
+                            </p>
+                            <ul>
+                                <li>لا تسجيل دخول</li>
+                                <li>لا إنشاء حساب</li>
+                                <li>لا بريد إلكتروني مطلوب</li>
+                                <li>لا كلمة مرور</li>
+                            </ul>
+                            <p>
+                                افتح الموقع وابدأ فوراً. كل حاجة بتشتغل بدون أي تسجيل!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Questions -->
+            <div class="faq-section" data-category="technical">
+                <h2 class="section-title">
+                    <span>⚙️</span>
+                    أسئلة تقنية
+                </h2>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">هل الموقع يعمل على الجوال؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                <strong>نعم، مصمم خصيصاً للجوال!</strong> الموقع:
+                            </p>
+                            <ul>
+                                <li><strong>Mobile-First Design:</strong> مصمم للجوال أولاً</li>
+                                <li><strong>PWA (تطبيق ويب تقدمي):</strong> تقدر تثبته زي التطبيقات العادية</li>
+                                <li><strong>يعمل بدون إنترنت:</strong> بعد الزيارة الأولى</li>
+                                <li><strong>Touch-Friendly:</strong> أزرار كبيرة وسهلة للمس</li>
+                            </ul>
+                            <div class="highlight-box">
+                                <p>
+                                    <strong>كيف تثبت التطبيق؟</strong> افتح الموقع في Chrome أو Safari → انقر "إضافة إلى الشاشة الرئيسية" → تمام!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">هل يعمل الموقع بدون إنترنت؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                <strong>نعم!</strong> بعد أول زيارة، الموقع يعمل offline تماماً:
+                            </p>
+                            <ul>
+                                <li>قراءة إجاباتك</li>
+                                <li>تعديل المهام اليومية</li>
+                                <li>تتبع نقاطك وإنجازاتك</li>
+                                <li>مراجعة المكونات الستة</li>
+                            </ul>
+                            <p>
+                                الموقع بيستخدم <strong>Service Workers</strong> لحفظ الملفات في جهازك عشان يشتغل بدون إنترنت.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span class="question-text">أي المتصفحات مدعومة؟</span>
+                        <span class="question-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="answer-content">
+                            <p>
+                                الموقع يعمل على جميع المتصفحات الحديثة:
+                            </p>
+                            <ul>
+                                <li><strong>Chrome:</strong> ✅ ممتاز (مع PWA كامل)</li>
+                                <li><strong>Firefox:</strong> ✅ ممتاز</li>
+                                <li><strong>Safari:</strong> ✅ جيد (بعض قيود PWA)</li>
+                                <li><strong>Edge:</strong> ✅ ممتاز</li>
+                                <li><strong>Opera:</strong> ✅ جيد</li>
+                            </ul>
+                            <p>
+                                <strong>الأفضل:</strong> Chrome على Android أو Safari على iOS للحصول على تجربة PWA كاملة.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div class="no-results" id="noResults">
+            <p style="font-size: 3em; margin-bottom: 20px;">🔍</p>
+            <p>ما لقينا نتائج لبحثك</p>
+            <p style="font-size: 1em; color: #a0aec0;">جرب كلمات مختلفة أو تواصل معنا</p>
+        </div>
+
+        <!-- Contact CTA -->
+        <div class="contact-cta">
+            <h3>💬 لسه عندك سؤال؟</h3>
+            <p>
+                ما لقيت إجابة سؤالك؟ تواصل معانا وهنساعدك بكل سرور!
+            </p>
+            <a href="/contact.html" class="contact-btn">تواصل معنا</a>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-nav">
+            <h3>📑 صفحات مفيدة</h3>
+            <div class="footer-links">
+                <a href="/privacy.html">سياسة الخصوصية</a>
+                <a href="/terms.html">شروط الاستخدام</a>
+                <a href="/about.html">من نحن</a>
+                <a href="/contact.html">اتصل بنا</a>
+            </div>
+            <a href="/index.html" class="back-home">🏠 العودة للصفحة الرئيسية</a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/storage.js"></script>
+    <script src="js/pwa-manager.js"></script>
+
+    <script>
+        // Accordion functionality
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.querySelector('.faq-question').addEventListener('click', () => {
+                // Close other items
+                document.querySelectorAll('.faq-item').forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+
+                // Toggle current item
+                item.classList.toggle('active');
+
+                // Haptic feedback
+                if (navigator.vibrate) {
+                    navigator.vibrate(30);
+                }
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const faqItems = document.querySelectorAll('.faq-item');
+        const faqSections = document.querySelectorAll('.faq-section');
+        const noResults = document.getElementById('noResults');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let hasResults = false;
+
+            if (searchTerm === '') {
+                // Show all
+                faqItems.forEach(item => item.style.display = 'block');
+                faqSections.forEach(section => section.style.display = 'block');
+                noResults.style.display = 'none';
+                return;
+            }
+
+            faqItems.forEach(item => {
+                const questionText = item.querySelector('.question-text').textContent.toLowerCase();
+                const answerText = item.querySelector('.answer-content').textContent.toLowerCase();
+
+                if (questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    item.parentElement.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Hide empty sections
+            faqSections.forEach(section => {
+                const visibleItems = section.querySelectorAll('.faq-item[style="display: block;"]');
+                section.style.display = visibleItems.length > 0 ? 'block' : 'none';
+            });
+
+            noResults.style.display = hasResults ? 'none' : 'block';
+        });
+
+        // Category filtering
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Update active button
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const category = this.dataset.category;
+                searchInput.value = ''; // Clear search
+
+                if (category === 'all') {
+                    faqSections.forEach(section => section.style.display = 'block');
+                    faqItems.forEach(item => item.style.display = 'block');
+                    noResults.style.display = 'none';
+                } else {
+                    faqSections.forEach(section => {
+                        if (section.dataset.category === category) {
+                            section.style.display = 'block';
+                        } else {
+                            section.style.display = 'none';
+                        }
+                    });
+                }
+
+                // Haptic feedback
+                if (navigator.vibrate) {
+                    navigator.vibrate(30);
+                }
+            });
+        });
+
+        // Haptic feedback for all clickable elements
+        document.querySelectorAll('button, a').forEach(element => {
+            element.addEventListener('click', () => {
+                if (navigator.vibrate) {
+                    navigator.vibrate(30);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

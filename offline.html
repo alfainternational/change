@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="أنت غير متصل بالإنترنت حالياً">
+    <title>غير متصل | تحويل حياتك</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FF6B35">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #2d3748;
+        }
+
+        .offline-container {
+            background: white;
+            border-radius: 30px;
+            padding: 50px 40px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .offline-icon {
+            font-size: 8em;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #fed7d7;
+            color: #c53030;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .features-available {
+            background: #f7fafc;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: right;
+        }
+
+        .features-available h2 {
+            color: #2d3748;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-list li {
+            color: #4a5568;
+            margin-bottom: 15px;
+            padding-right: 35px;
+            position: relative;
+            font-size: 1.1em;
+            text-align: right;
+        }
+
+        .features-list li:before {
+            content: "✓";
+            position: absolute;
+            right: 0;
+            color: #48bb78;
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B35 0%, #ff8c42 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .connection-status {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.95em;
+            display: none;
+        }
+
+        .connection-status.online {
+            background: #c6f6d5;
+            color: #22543d;
+            display: block;
+        }
+
+        .connection-status.checking {
+            background: #feebc8;
+            color: #7c2d12;
+            display: block;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border-right: 4px solid #3b82f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: right;
+        }
+
+        .info-box p {
+            color: #1e40af;
+            font-size: 1em;
+            margin-bottom: 0;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .offline-container {
+                padding: 35px 25px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .subtitle {
+                font-size: 1.1em;
+            }
+
+            .offline-icon {
+                font-size: 6em;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Dark clouds animation */
+        .cloud {
+            position: absolute;
+            top: 20%;
+            opacity: 0.1;
+            animation: float 20s infinite;
+        }
+
+        .cloud:nth-child(2) {
+            top: 40%;
+            animation-delay: 5s;
+            animation-duration: 25s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateX(-100px);
+            }
+            50% {
+                transform: translateX(100px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background clouds -->
+    <div class="cloud" style="left: 10%; font-size: 4em;">☁️</div>
+    <div class="cloud" style="right: 10%; font-size: 5em;">☁️</div>
+
+    <div class="offline-container">
+        <div class="offline-icon">📡</div>
+
+        <h1>أنت غير متصل</h1>
+
+        <p class="subtitle">
+            يبدو إن الإنترنت مش شغال حالياً.<br>
+            لكن ما تقلق، لسه تقدر تستخدم بعض الميزات!
+        </p>
+
+        <div class="status-badge">
+            🔴 لا يوجد اتصال بالإنترنت
+        </div>
+
+        <!-- Features Available Offline -->
+        <div class="features-available">
+            <h2>✨ متاح في وضع عدم الاتصال</h2>
+            <ul class="features-list">
+                <li>قراءة إجاباتك على البروتوكول المحفوظة</li>
+                <li>مراجعة المكونات الستة (Anti-Vision, Vision, Goals)</li>
+                <li>تتبع تقدمك في نظام اللعبة</li>
+                <li>عرض الإنجازات والنقاط</li>
+                <li>تعديل المهام اليومية (Daily Levers)</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <p>
+                <strong>💡 تلميحة:</strong> كل بياناتك محفوظة في جهازك. لما الإنترنت يرجع، تقدر تكمل من وين وقفت بالضبط.
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="buttons">
+            <button class="btn btn-primary" id="retryBtn">
+                🔄 إعادة المحاولة
+            </button>
+            <a href="/" class="btn btn-secondary">
+                🏠 الصفحة الرئيسية
+            </a>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="connection-status" id="connectionStatus"></div>
+
+        <!-- Additional Info -->
+        <div style="margin-top: 30px; padding-top: 25px; border-top: 2px solid #e2e8f0;">
+            <p style="color: #718096; font-size: 0.95em;">
+                <strong>نصائح لحل المشكلة:</strong>
+            </p>
+            <ul style="color: #4a5568; text-align: right; list-style: none; padding: 0; margin-top: 15px;">
+                <li style="margin-bottom: 8px;">📶 تأكد إن الواي فاي أو بيانات الجوال شغالة</li>
+                <li style="margin-bottom: 8px;">✈️ تأكد إن وضع الطيران مش مفعّل</li>
+                <li style="margin-bottom: 8px;">🔄 جرب تعيد تشغيل الراوتر أو الجهاز</li>
+                <li style="margin-bottom: 8px;">🌐 جرب تفتح موقع تاني للتأكد من الاتصال</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Retry button handler
+        document.getElementById('retryBtn').addEventListener('click', function() {
+            const btn = this;
+            const status = document.getElementById('connectionStatus');
+
+            // Show checking status
+            btn.innerHTML = '🔄 جاري الفحص... <span class="loading-spinner"></span>';
+            btn.disabled = true;
+            status.className = 'connection-status checking';
+            status.textContent = '⏳ جاري التحقق من الاتصال...';
+
+            // Check connection
+            checkConnection().then(isOnline => {
+                if (isOnline) {
+                    status.className = 'connection-status online';
+                    status.textContent = '✅ تم استعادة الاتصال! جاري إعادة التحميل...';
+
+                    // Add haptic feedback if supported
+                    if (navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100]);
+                    }
+
+                    // Reload the page
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    btn.innerHTML = '🔄 إعادة المحاولة';
+                    btn.disabled = false;
+                    status.className = 'connection-status';
+                    status.style.display = 'block';
+                    status.style.background = '#fed7d7';
+                    status.style.color = '#c53030';
+                    status.textContent = '❌ لا يزال الاتصال غير متوفر. جرب مرة أخرى بعد قليل.';
+
+                    setTimeout(() => {
+                        status.style.display = 'none';
+                    }, 3000);
+                }
+            });
+        });
+
+        // Check connection function
+        async function checkConnection() {
+            try {
+                // Try to fetch a small resource
+                const response = await fetch('/manifest.json', {
+                    method: 'HEAD',
+                    cache: 'no-cache'
+                });
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // Listen for online event
+        window.addEventListener('online', function() {
+            const status = document.getElementById('connectionStatus');
+            status.className = 'connection-status online';
+            status.textContent = '✅ تم استعادة الاتصال! جاري إعادة التحميل...';
+
+            // Add haptic feedback if supported
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        });
+
+        // Auto-check connection every 10 seconds
+        setInterval(() => {
+            if (navigator.onLine) {
+                checkConnection().then(isOnline => {
+                    if (isOnline) {
+                        window.location.reload();
+                    }
+                });
+            }
+        }, 10000);
+
+        // Add haptic feedback for buttons
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            });
+        });
+
+        // Check if there's saved data
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedData = localStorage.getItem('lifeTransformData');
+            if (!savedData) {
+                const infoBox = document.querySelector('.info-box');
+                infoBox.style.background = '#fef3c7';
+                infoBox.style.borderColor = '#f59e0b';
+                infoBox.querySelector('p').style.color = '#92400e';
+                infoBox.querySelector('p').innerHTML = '<strong>⚠️ تنبيه:</strong> يبدو إنك لسه ما بدأت البروتوكول. لازم تكون متصل بالإنترنت لبداية استخدام الموقع.';
+
+                // Hide features available section
+                document.querySelector('.features-available').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
