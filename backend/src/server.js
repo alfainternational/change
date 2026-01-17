@@ -5,8 +5,14 @@ const compression = require('compression');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 const config = require('./config');
 const { connectRedis } = require('./config/redis');
+const logger = require('./utils/logger');
+const { errorHandler, notFoundHandler, initializeErrorHandlers } = require('./utils/errorHandler');
+
+// Initialize error handlers
+initializeErrorHandlers();
 
 // Initialize Express app
 const app = express();
@@ -40,10 +46,11 @@ app.use(cookieParser());
 app.use(compression());
 
 // Logging middleware
+app.use(logger.middleware);
 if (config.server.env === 'development') {
   app.use(morgan('dev'));
 } else {
-  app.use(morgan('combined'));
+  app.use(morgan('combined', { stream: logger.stream }));
 }
 
 // Rate limiting
@@ -60,12 +67,21 @@ const limiter = rateLimit({
 
 app.use('/api/', limiter);
 
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 // API Routes
 const authRoutes = require('./routes/authRoutes');
 const contentRoutes = require('./routes/contentRoutes');
+const learningPathRoutes = require('./routes/learningPathRoutes');
+const discussionRoutes = require('./routes/discussionRoutes');
+const reputationRoutes = require('./routes/reputationRoutes');
 
 app.use(`${config.server.apiVersion}/auth`, authRoutes);
 app.use(`${config.server.apiVersion}/content`, contentRoutes);
+app.use(`${config.server.apiVersion}/learning-paths`, learningPathRoutes);
+app.use(`${config.server.apiVersion}/discussions`, discussionRoutes);
+app.use(`${config.server.apiVersion}/reputation`, reputationRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -88,69 +104,44 @@ app.get('/', (req, res) => {
 });
 
 // 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'المسار غير موجود'
-  });
-});
+app.use(notFoundHandler);
 
 // Global error handler
-app.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
-
-  // Joi validation error
-  if (err.isJoi) {
-    return res.status(400).json({
-      success: false,
-      message: 'خطأ في البيانات المدخلة',
-      errors: err.details
-    });
-  }
-
-  // Database error
-  if (err.code && err.code.startsWith('23')) {
-    return res.status(400).json({
-      success: false,
-      message: 'خطأ في قاعدة البيانات',
-      error: config.server.env === 'development' ? err.message : undefined
-    });
-  }
-
-  // Default error
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'خطأ في الخادم',
-    error: config.server.env === 'development' ? err : undefined
-  });
-});
+app.use(errorHandler);
 
 // Start server
 const PORT = config.server.port;
 
 const server = app.listen(PORT, () => {
-  console.log(`
-╔════════════════════════════════════════════════════════════╗
-║                                                            ║
-║   🚀 Knowledge Platform API Server                        ║
-║                                                            ║
-║   Environment: ${config.server.env.padEnd(20)}                     ║
-║   Port: ${PORT.toString().padEnd(20)}                               ║
-║   API Base: ${config.server.apiVersion.padEnd(20)}                   ║
-║                                                            ║
-║   📊 Health Check: http://localhost:${PORT}/health         ║
-║   📚 API Docs: http://localhost:${PORT}${config.server.apiVersion}/docs║
-║                                                            ║
-╚════════════════════════════════════════════════════════════╝
+  logger.info(`
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║   🚀 Knowledge Platform API Server                              ║
+║                                                                  ║
+║   Environment: ${config.server.env.padEnd(20)}                               ║
+║   Port: ${PORT.toString().padEnd(20)}                                         ║
+║   API Base: ${config.server.apiVersion.padEnd(20)}                             ║
+║                                                                  ║
+║   📊 Health: http://localhost:${PORT}/health                     ║
+║   📚 Docs: http://localhost:${PORT}${config.server.apiVersion}/docs    ║
+║                                                                  ║
+║   🔌 Active Routes:                                              ║
+║      • /api/v1/auth            (Authentication)                 ║
+║      • /api/v1/content         (Content Management)             ║
+║      • /api/v1/learning-paths  (Learning System)                ║
+║      • /api/v1/discussions     (Forums & Q&A)                   ║
+║      • /api/v1/reputation      (Gamification)                   ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
   `);
 });
 
 // Graceful shutdown
 const gracefulShutdown = async (signal) => {
-  console.log(`\n${signal} received. Starting graceful shutdown...`);
+  logger.info(`\n${signal} received. Starting graceful shutdown...`);
 
   server.close(async () => {
-    console.log('HTTP server closed');
+    logger.info('HTTP server closed');
 
     // Close database connections
     const { closePool } = require('./config/database');
@@ -160,13 +151,13 @@ const gracefulShutdown = async (signal) => {
     const { closeRedis } = require('./config/redis');
     await closeRedis();
 
-    console.log('All connections closed. Exiting...');
+    logger.info('All connections closed. Exiting...');
     process.exit(0);
   });
 
   // Force shutdown after 30 seconds
   setTimeout(() => {
-    console.error('Forcing shutdown after timeout');
+    logger.error('Forcing shutdown after timeout');
     process.exit(1);
   }, 30000);
 };
@@ -174,17 +165,5 @@ const gracefulShutdown = async (signal) => {
 // Handle shutdown signals
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
-// Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-  gracefulShutdown('uncaughtException');
-});
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  gracefulShutdown('unhandledRejection');
-});
 
 module.exports = app;
