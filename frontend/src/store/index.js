@@ -2,12 +2,18 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import contentReducer from './slices/contentSlice';
 import uiReducer from './slices/uiSlice';
+import learningReducer from './slices/learningSlice';
+import discussionReducer from './slices/discussionSlice';
+import notificationReducer from './slices/notificationSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     content: contentReducer,
     ui: uiReducer,
+    learning: learningReducer,
+    discussion: discussionReducer,
+    notification: notificationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
