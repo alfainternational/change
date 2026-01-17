@@ -157,12 +157,18 @@ const discussionSchemas = {
       .default('discussion')
   }),
 
-  reply: Joi.object({
+  createReply: Joi.object({
     content: Joi.string().min(10).required().messages({
       'string.min': 'الرد يجب أن يكون 10 أحرف على الأقل',
       'any.required': 'محتوى الرد مطلوب'
     }),
     parent_reply_id: Joi.string().uuid().allow(null)
+  }),
+
+  updateReply: Joi.object({
+    content: Joi.string().min(10).required().messages({
+      'string.min': 'الرد يجب أن يكون 10 أحرف على الأقل'
+    })
   }),
 
   update: Joi.object({
@@ -184,15 +190,22 @@ const learningPathSchemas = {
     thumbnail_url: Joi.string().uri().allow('')
   }),
 
-  enroll: Joi.object({
-    path_id: Joi.string().uuid().required()
+  update: Joi.object({
+    title: Joi.string().min(5).max(300),
+    slug: Joi.string(),
+    description: Joi.string().max(2000),
+    difficulty_level: Joi.string()
+      .valid('beginner', 'intermediate', 'advanced', 'expert'),
+    estimated_hours: Joi.number().min(1),
+    thumbnail_url: Joi.string().uri().allow(''),
+    is_active: Joi.boolean()
   }),
 
-  progressUpdate: Joi.object({
-    lesson_id: Joi.string().uuid().required(),
-    completion_percentage: Joi.number().min(0).max(100).required(),
-    time_spent_minutes: Joi.number().min(0).default(0),
-    notes: Joi.string().max(1000).allow('')
+  updateProgress: Joi.object({
+    completion_percentage: Joi.number().min(0).max(100),
+    time_spent_minutes: Joi.number().min(0),
+    notes: Joi.string().max(1000).allow(''),
+    last_position: Joi.string().max(500).allow('')
   })
 };
 
